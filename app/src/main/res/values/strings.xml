@@ -15,6 +15,9 @@
     <!--API-->
     <string name="server">http://192.168.10.50:8084/</string>
     <string name="login">api/Usuario/LogIn</string>
+    <string name="generaToken">api/Token/GeneraTokenUsuario</string>
+    <string name="validaToken">api/Token/ValidaTokenActivo?Token=</string>
+    <!--End API-->
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -30,4 +33,11 @@
     <string name="modulos">Modulos</string>
     <string name="clientes">Clientes</string>
     <string name="preference_file_key">preference_file_key</string>
+    <string name="splashLeyend">Bienvenido a LumoSolutions</string>
+    <string name="peticionIncorrecta">La peticion al servidor fue incorrecta</string>
+    <string name="valido">Valido</string>
+    <string name="message">Message</string>
+    <string name="isSuccessStatusCode">IsSuccessStatusCode</string>
+    <string name="comentarios">Comentarios</string>
+    <string name="logOut">Log out</string>
 </resources>

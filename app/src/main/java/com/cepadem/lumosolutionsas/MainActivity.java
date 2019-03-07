@@ -1,9 +1,9 @@
 package com.cepadem.lumosolutionsas;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -20,7 +20,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.cepadem.lumosolutionsas.Fragments.CDEQUERYFragment;
 import com.cepadem.lumosolutionsas.Fragments.dummy.DummyContent;
@@ -34,7 +33,7 @@ import java.util.List;
 import com.cepadem.lumosolutionsas.Utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CDEQUERYFragment.OnListFragmentInteractionListener {
-
+    private final String cdequeryfragment = "CDEQUERYFragment";
     Utils utils = new Utils();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         Fragment fragment = new CDEQUERYFragment();
-        transaction.add(R.id.framePrincipal, fragment, "CDEQUERYFragment");
-        transaction.addToBackStack(null);
-        transaction.commit();
+        transaction.add(R.id.framePrincipal, fragment, cdequeryfragment).addToBackStack(cdequeryfragment).commit();
     }
 
     private void agregaMenu(NavigationView navigationView) throws JSONException {
@@ -101,12 +98,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-        /*menu.add(1,1,1,"camara").setIcon(R.drawable.ic_menu_camera);
-        menu.add(1,2,1,"galeria").setIcon(R.drawable.ic_menu_gallery);*/
-
         SubMenu subMenu = menu.addSubMenu(2,100,100,"Submenu").setHeaderIcon(R.drawable.side_nav_bar);
-        subMenu.add(2,101,101,"Comentarios").setIcon(R.drawable.ic_message_text);
-        subMenu.add(2,102,102,"Log out").setIcon(R.drawable.ic_logout);
+        subMenu.add(2,101,101,getString(R.string.comentarios)).setIcon(R.drawable.ic_message_text);
+        subMenu.add(2,102,102,getString(R.string.logOut)).setIcon(R.drawable.ic_logout);
     }
 
     @Override
@@ -159,11 +153,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_send) {
 
+        }else if (id == 102){
+            logOut();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void logOut(){
+        utils.removeShared(this, R.string.token);
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override

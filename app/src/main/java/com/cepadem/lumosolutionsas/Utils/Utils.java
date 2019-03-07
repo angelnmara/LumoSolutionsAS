@@ -17,6 +17,10 @@ public class Utils {
         editor.putString(activity.getString(variable), valor);
         editor.commit();
     }
+    public void removeShared(Activity activity, int variable){
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        sharedPref.edit().remove(activity.getString(variable)).commit();
+    }
     public List<MenuImg> GetMenuImg(){
         List<MenuImg> menus = new ArrayList<>();
         menus.add(new MenuImg(152,R.drawable.ic_face_agent));

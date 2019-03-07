@@ -3,8 +3,10 @@ package com.cepadem.lumosolutionsas;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -20,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -84,6 +87,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //validaToken();
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -111,6 +115,52 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    /*private void validaToken() {
+        SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString(getString(R.string.token), "");
+        if(token!=""){
+            esTokenValido(token);
+        }
+    }*/
+
+    /*private void esTokenValido(String token) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String server = getResources().getString(R.string.server);
+        String endPointLogin = getResources().getString(R.string.validaToken);
+        String url = server + endPointLogin + token;
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    showProgress(false);
+                    JSONObject jsonObjectMsg = response.getJSONObject("Message");
+                    if(jsonObjectMsg.getBoolean("IsSuccessStatusCode")){
+                        //Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+                        Log.d("LoginActivity", response.toString());
+                        if(response.getBoolean("Valido")){
+                            iniciaMenuPrincipal();
+                        }
+                    }else{
+                        Toast.makeText(getApplicationContext(), "La petición al servidor fue incorrecta", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showProgress(false);
+                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
+    }*/
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -211,7 +261,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void loginTask(String email, String password) {
+    private void loginTask(final String email, final String password) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String server = getResources().getString(R.string.server);
         String endPointLogin = getResources().getString(R.string.login);
@@ -237,6 +287,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         if(response.getBoolean("EsValido")){
                             //Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
                             iniciaMenuPrincipal();
+                            guardaToken(email, password);
                             guardaRespuesta(response);
                         }else{
                             mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -260,6 +311,59 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Add the request to the RequestQueue.
         queue.add(jsonObjectRequest);
+    }
+
+    private void guardaToken(String email, String password) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String server = getResources().getString(R.string.server);
+        String endPointLogin = getResources().getString(R.string.generaToken);
+        String url = server + endPointLogin;
+
+        try {
+            jsonRequest = new JSONObject("{\n" +
+                    getString(R.string.usuarioL) + email + "\",\n" +
+                    getString(R.string.contrasenaL) + password + "\"\n" +
+                    "}");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonRequest, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    Log.d("LoginActivity", response.toString());
+                    JSONObject jsonObjectMsg = response.getJSONObject("Message");
+                    if(jsonObjectMsg.getBoolean("IsSuccessStatusCode")){
+                        //Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+                        if(response.getBoolean("Valido")){
+                            guardaTokenShared(response);
+                        }else{
+                            Log.d("LoginActivity", "Token invalido");
+                        }
+
+                    }else{
+                        Toast.makeText(getApplicationContext(), "La petición al servidor fue incorrecta", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showProgress(false);
+                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
+    }
+
+    private void guardaTokenShared(JSONObject response) {
+        utils.guardaShared(this, R.string.token, response.optString(getString(R.string.token)));
     }
 
     private void guardaRespuesta(JSONObject response) throws JSONException {
@@ -371,8 +475,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void iniciaMenuPrincipal(){
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         //intent.putExtra();
         startActivity(intent);
+        finish();
     }
 }
