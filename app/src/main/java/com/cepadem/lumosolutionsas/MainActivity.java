@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.SubMenu;
 import android.view.View;
@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.cepadem.lumosolutionsas.Fragments.CDEQUERYFragment;
+import com.cepadem.lumosolutionsas.Fragments.MyCDEQUERYRecyclerViewAdapter;
 import com.cepadem.lumosolutionsas.Fragments.dummy.DummyContent;
 import com.cepadem.lumosolutionsas.Models.MenuImg;
 
@@ -32,9 +33,10 @@ import org.json.JSONObject;
 import java.util.List;
 import com.cepadem.lumosolutionsas.Utils.Utils;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CDEQUERYFragment.OnListFragmentInteractionListener {
-    private final String cdequeryfragment = "CDEQUERYFragment";
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+    //private final String cdequeryfragment = "CDEQUERYFragment";
     Utils utils = new Utils();
+    private int mColumnCount = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,15 +66,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             e.printStackTrace();
         }
         navigationView.setNavigationItemSelectedListener(this);
-        openFragmentActivos();
+
+        fillListaPrincipal();
+        //openFragmentActivos();
     }
 
-    private void openFragmentActivos(){
+    private void fillListaPrincipal() {
+        RecyclerView recyclerView = findViewById(R.id.list);
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(this, mColumnCount));
+        }
+        recyclerView.setAdapter(new MyCDEQUERYRecyclerViewAdapter(DummyContent.ITEMS));
+    }
+
+    /*private void openFragmentActivos(){
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         Fragment fragment = new CDEQUERYFragment();
         transaction.add(R.id.framePrincipal, fragment, cdequeryfragment).addToBackStack(cdequeryfragment).commit();
-    }
+    }*/
 
     private void agregaMenu(NavigationView navigationView) throws JSONException {
         /*Obten menu*/
@@ -170,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         finish();
     }
 
-    @Override
+    /*@Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
         Log.d("MainActivity", "onListFragmentInteraction");
-    }
+    }*/
 }

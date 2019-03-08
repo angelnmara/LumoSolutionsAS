@@ -20,12 +20,14 @@ import java.util.List;
 public class MyCDEQUERYRecyclerViewAdapter extends RecyclerView.Adapter<MyCDEQUERYRecyclerViewAdapter.ViewHolder> {
 
     private final List<DummyItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    /*private final OnListFragmentInteractionListener mListener;*/
 
-    public MyCDEQUERYRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyCDEQUERYRecyclerViewAdapter(List<DummyItem> items) {
         mValues = items;
-        mListener = listener;
+        /*mListener = listener;*/
     }
+
+    /*, OnListFragmentInteractionListener listener*/
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -40,7 +42,7 @@ public class MyCDEQUERYRecyclerViewAdapter extends RecyclerView.Adapter<MyCDEQUE
         holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).content);
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        /*holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
@@ -49,7 +51,7 @@ public class MyCDEQUERYRecyclerViewAdapter extends RecyclerView.Adapter<MyCDEQUE
                     mListener.onListFragmentInteraction(holder.mItem);
                 }
             }
-        });
+        });*/
     }
 
     @Override

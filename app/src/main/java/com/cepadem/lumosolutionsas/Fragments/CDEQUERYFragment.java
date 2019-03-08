@@ -70,7 +70,7 @@ public class CDEQUERYFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyCDEQUERYRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyCDEQUERYRecyclerViewAdapter(DummyContent.ITEMS));
         }
         return view;
     }
